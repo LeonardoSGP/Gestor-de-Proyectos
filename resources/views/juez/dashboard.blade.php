@@ -7,7 +7,7 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            
+
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <div class="bg-white p-4 rounded shadow border-b-2 border-indigo-500">
                     <div class="text-gray-500 text-sm">Proyectos Asignados</div>
@@ -26,35 +26,64 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
                     <h3 class="text-lg font-medium text-gray-900 mb-4">Proyectos Pendientes de Evaluación</h3>
-                    
+
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Equipo</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Proyecto</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Evento</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acción</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Equipo</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Proyecto</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Evento</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Estado</th>
+                                    <th
+                                        class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Acción</th>
                                 </tr>
                             </thead>
+                            <!-- ... encabezados de la tabla ... -->
                             <tbody class="bg-white divide-y divide-gray-200">
-                                {{-- Aquí iterarías tus variables: @foreach($proyectos as $proyecto) --}}
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Alpha Team</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Sistema de Riego IoT</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Hackathon 2025</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                            Pendiente
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <a href="#" class="text-indigo-600 hover:text-indigo-900">Evaluar →</a>
-                                    </td>
-                                </tr>
-                                {{-- @endforeach --}}
+                                @foreach ($proyectos as $proyecto)
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                            {{ $proyecto->equipo->nombre }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {{ $proyecto->nombre }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {{ $proyecto->evento->nombre }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            @if ($proyecto->estado_evaluacion == 'Calificado')
+                                                <span
+                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                    Completado
+                                                </span>
+                                            @else
+                                                <span
+                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                                    Pendiente
+                                                </span>
+                                            @endif
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <a href="{{ route('juez.evaluacion.edit', $proyecto) }}"
+                                                class="text-indigo-600 hover:text-indigo-900 font-bold">
+                                                {{ $proyecto->estado_evaluacion == 'Calificado' ? 'Editar Notas' : 'Evaluar →' }}
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @endforeach
                             </tbody>
+                            <!-- ... cierre de tabla ... -->
                         </table>
                     </div>
                 </div>
