@@ -17,7 +17,7 @@
             </div>
 
             <!-- Quick Stats (Placeholder) -->
-            <div class="grid grid-cols-1 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div
                     class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100 dark:border-gray-700">
                     <div class="flex items-center">
