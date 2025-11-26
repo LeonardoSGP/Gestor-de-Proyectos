@@ -18,10 +18,8 @@ class UsuarioController extends Controller
      */
     public function index(Request $request)
     {
-        // Iniciamos la consulta
         $query = User::with('roles')->latest();
 
-        // 1. Filtro por Texto (Nombre o Email)
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -30,7 +28,6 @@ class UsuarioController extends Controller
             });
         }
 
-        // 2. Filtro por Rol
         if ($request->filled('role')) {
             $roleName = $request->role;
             $query->whereHas('roles', function ($q) use ($roleName) {
@@ -38,10 +35,8 @@ class UsuarioController extends Controller
             });
         }
 
-        // Paginamos y mantenemos los filtros en la URL (para que al cambiar de página no se pierda la búsqueda)
         $usuarios = $query->paginate(10)->withQueryString();
 
-        // Necesitamos enviar los roles a la vista para llenar el <select> del filtro
         $roles = Rol::all();
 
         return view('admin.usuarios.index', compact('usuarios', 'roles'));
@@ -69,8 +64,6 @@ class UsuarioController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        // 2. Asignar el Rol en la tabla pivote (user_rol)
-        // attach() crea la relación en la tabla intermedia
         $user->roles()->attach($request->rol_id);
 
         return redirect()->route('admin.usuarios.index')

@@ -10,28 +10,22 @@ use Illuminate\Http\Request;
 
 class EquipoController extends Controller
 {
-    // Muestra la vista de edición (Nombre + Miembros)
     public function edit(Equipo $equipo)
     {
-        // 1. Cargar relaciones primero para evitar errores
         $equipo->load('proyecto.evento');
 
-        // 2. Verificar integridad de datos
         if (!$equipo->proyecto || !$equipo->proyecto->evento) {
             return back()->with('error', 'Error crítico: Este equipo no tiene un proyecto o evento asociado.');
         }
 
         // 3. VALIDACIÓN DE SEGURIDAD (Corregida)
-        // Usamos $equipo->proyecto->evento en lugar de $equipo->evento
         if ($equipo->proyecto->evento->fecha_fin < now()) {
             return back()->with('error', 'Este evento ya finalizó, no se pueden editar equipos.');
         }
 
-        // 4. Datos para la vista (Lo demás sigue igual)
-        $equipo->load(['participantes.user', 'participantes.carrera']); // Proyecto ya cargado arriba
+        $equipo->load(['participantes.user', 'participantes.carrera']);
         $perfiles = Perfil::all();
 
-        // Candidatos
         $candidatos = Participante::whereDoesntHave('equipos')
             ->with(['user', 'carrera'])
             ->get()
@@ -45,7 +39,6 @@ class EquipoController extends Controller
         return view('juez.equipos.edit', compact('equipo', 'perfiles', 'candidatos'));
     }
 
-    // Actualizar Nombre del Equipo
     public function update(Request $request, Equipo $equipo)
     {
         $request->validate([
@@ -57,7 +50,6 @@ class EquipoController extends Controller
         return back()->with('success', 'Nombre del equipo actualizado.');
     }
 
-    // Agregar Miembro
     public function addMember(Request $request, Equipo $equipo)
     {
         // Validar cupo
@@ -70,7 +62,6 @@ class EquipoController extends Controller
             'perfil_id' => 'required|exists:perfiles,id',
         ]);
 
-        // Validar que el alumno no tenga equipo ya (Doble check)
         $participante = Participante::find($request->participante_id);
         if ($participante->equipos()->exists()) {
             return back()->with('error', 'El alumno ya pertenece a otro equipo.');

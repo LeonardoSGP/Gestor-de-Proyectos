@@ -19,25 +19,21 @@ class EquipoController extends Controller
         if ($request->filled('search')) $query->where('nombre', 'like', '%' . $request->search . '%');
         
         $equipos = $query->latest()->paginate(10)->withQueryString();
-        $eventos = Evento::all(); // Para filtros si los implementas después
+        $eventos = Evento::all(); 
 
         return view('admin.equipos.index', compact('equipos', 'eventos'));
     }
 
     public function create()
     {
-        // Necesitamos los eventos para saber a cuál asociar el equipo
         $eventos = Evento::where('fecha_fin', '>=', now())->get(); 
         return view('admin.equipos.create', compact('eventos'));
     }
 
     public function store(StoreEquipoRequest $request)
     {
-        // Creamos el equipo (validado por el Request)
         $equipo = Equipo::create($request->validated());
         
-        // Si el request incluía datos del proyecto, lo creamos de una vez (Opcional)
-        // $equipo->proyecto()->create([...]);
 
         return redirect()->route('admin.equipos.show', $equipo)
                          ->with('success', 'Equipo creado. Ahora agrega los integrantes.');
@@ -45,13 +41,11 @@ class EquipoController extends Controller
 
     public function show(Equipo $equipo)
     {
-        // Cargamos relaciones necesarias
+        
         $equipo->load(['participantes.user', 'participantes.carrera', 'proyecto.evento']);
         
         $perfiles = Perfil::all();
 
-        // Traemos participantes para el "Buscador Modo Dios"
-        // Optimizamos cargando solo lo necesario
         $todos_participantes = Participante::with('user')->get();
 
         return view('admin.equipos.show', compact('equipo', 'perfiles', 'todos_participantes'));

@@ -12,7 +12,6 @@ class ResultadosController extends Controller
 {
     public function index(Request $request)
     {
-        // Si no seleccionan evento, mostramos el más reciente activo
         $eventoId = $request->get('evento_id');
         $evento = $eventoId ? Evento::find($eventoId) : Evento::latest()->first();
 
@@ -20,12 +19,10 @@ class ResultadosController extends Controller
         $ranking = collect();
 
         if ($evento) {
-            // Traemos proyectos del evento con sus calificaciones
             $proyectos = Proyecto::where('evento_id', $evento->id)
                 ->with(['calificaciones', 'equipo'])
                 ->get();
 
-            // Calculamos puntaje para cada proyecto
             $ranking = $proyectos->map(function ($proyecto) use ($evento) {
                 $totalPuntos = 0;
                 $calificacionesAgrupadas = $proyecto->calificaciones->groupBy('criterio_id');
@@ -57,7 +54,6 @@ class ResultadosController extends Controller
     {
         $proyecto = Proyecto::with(['equipo.participantes.user', 'evento'])->findOrFail($proyectoId);
 
-        // Determinar el texto del logro según la posición
         $textoLogro = match ($posicion) {
             '1' => 'PRIMER LUGAR',
             '2' => 'SEGUNDO LUGAR',
@@ -66,7 +62,6 @@ class ResultadosController extends Controller
         };
 
         // Generamos el PDF usando una vista Blade
-        // 'landscape' es horizontal, ideal para diplomas
         $pdf = Pdf::loadView('admin.resultados.pdf', compact('proyecto', 'textoLogro'))
             ->setPaper('a4', 'landscape');
 

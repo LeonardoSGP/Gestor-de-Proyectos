@@ -29,28 +29,21 @@ class ProyectoController extends Controller
 
     public function show(Proyecto $proyecto)
     {
-        // Cargamos relaciones necesarias para el cálculo
         $proyecto->load(['equipo.participantes', 'evento.criterios', 'calificaciones']);
 
-        // --- LÓGICA DE CÁLCULO DE PUNTAJE ---
-        // 1. Agrupar calificaciones por criterio
         $calificacionesPorCriterio = $proyecto->calificaciones->groupBy('criterio_id');
         
         $desglosePuntaje = [];
         $puntajeTotal = 0;
 
         foreach ($proyecto->evento->criterios as $criterio) {
-            // Obtener todas las notas que los jueces dieron a este criterio específico
             $notas = $calificacionesPorCriterio->get($criterio->id);
             
             if ($notas && $notas->count() > 0) {
                 // Promedio simple de los jueces (ej: Juez A puso 80, Juez B puso 100 -> Promedio 90)
                 $promedioJueces = $notas->avg('puntuacion');
                 
-                // Aplicar ponderación del evento (ej: Este criterio vale 30%)
-                // Fórmula: (Promedio * Porcentaje) / 100
-                $puntosObtenidos = ($promedioJueces * $criterio->ponderacion) / 100; // Resultado en escala 0-Criterio%
-                // O si prefieres escala 0-100 ponderada: $promedioJueces * ($criterio->ponderacion / 100)
+                $puntosObtenidos = ($promedioJueces * $criterio->ponderacion) / 100;
                 
                 $desglosePuntaje[] = [
                     'criterio' => $criterio->nombre,
