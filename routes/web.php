@@ -96,6 +96,15 @@ Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->grou
 
     // Gestión de Perfiles
     Route::resource('perfiles', \App\Http\Controllers\Admin\PerfilController::class);
+
+    // Reportes
+    Route::prefix('reportes')->name('reportes.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\ReporteController::class, 'index'])->name('index');
+        Route::get('/usuarios/pdf', [\App\Http\Controllers\Admin\ReporteController::class, 'usuariosPdf'])->name('usuarios.pdf');
+        Route::get('/equipos/pdf', [\App\Http\Controllers\Admin\ReporteController::class, 'equiposPdf'])->name('equipos.pdf');
+        Route::get('/eventos/pdf', [\App\Http\Controllers\Admin\ReporteController::class, 'eventosPdf'])->name('eventos.pdf');
+        Route::get('/proyectos/pdf', [\App\Http\Controllers\Admin\ReporteController::class, 'proyectosPdf'])->name('proyectos.pdf');
+    });
 });
 
 // ==========================================
