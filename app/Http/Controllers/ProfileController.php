@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\Carrera;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,23 +17,64 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
+        $user = $request->user();
+        $carreras = Carrera::all(); // Necesario para el dropdown de participante
+
         return view('profile.edit', [
-            'user' => $request->user(),
+            'user' => $user,
+            'carreras' => $carreras,
+            'esParticipante' => $user->roles->contains('nombre', 'Participante'),
         ]);
     }
 
     /**
      * Update the user's profile information.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(Request $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
+        $esParticipante = $user->roles->contains('nombre', 'Participante');
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        // 1. Validación Dinámica
+        if ($esParticipante) {
+            // Usamos validación manual o inyectamos el request correspondiente
+            $validated = $request->validate([
+                'name' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'email', 'max:255', 'unique:users,email,'.$user->id],
+                'telefono' => ['nullable', 'string', 'max:20'],
+                'no_control' => ['required', 'string', 'max:20', 'unique:participantes,no_control,'.($user->participante->id ?? 'NULL')],
+                'carrera_id' => ['required', 'exists:carreras,id'],
+            ]);
+        } else {
+            $validated = $request->validate([
+                'name' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'email', 'max:255', 'unique:users,email,'.$user->id],
+            ]);
         }
 
-        $request->user()->save();
+        // 2. Actualizar Tabla User
+        $user->fill([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+        ]);
+
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+        }
+
+        $user->save();
+
+        // 3. Actualizar Tabla Participante (Si aplica)
+        if ($esParticipante && $user->participante) {
+            $user->participante->update([
+                'no_control' => $validated['no_control'],
+                'carrera_id' => $validated['carrera_id'],
+                // 'telefono' => $validated['telefono'] // Asumiendo que agregaste esta columna a participantes o users
+            ]);
+            
+            // Si el teléfono está en la tabla users, agrégalo al fill de arriba.
+            // Si está en participantes, úsalo aquí.
+        }
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }

@@ -1,124 +1,143 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Unirse a un Equipo') }}
+            {{ __('Explorar Equipos') }}
         </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="py-12 bg-gray-50 dark:bg-gray-900 min-h-screen">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
 
-            <div class="mb-6 flex justify-between items-center">
-                <form method="GET" action="{{ route('participante.equipos.join') }}" class="flex items-center gap-4">
-                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Filtrar por Evento:</label>
-                    <select name="evento_id" onchange="this.form.submit()"
-                        class="rounded-md border-gray-300 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm py-2 pl-3 pr-10">
-                        <option value="">Todos los eventos activos</option>
-                        @foreach ($eventos as $evento)
-                            <option value="{{ $evento->id }}"
-                                {{ request('evento_id') == $evento->id ? 'selected' : '' }}>
-                                {{ $evento->nombre }}
-                            </option>
-                        @endforeach
-                    </select>
+            {{-- 1. BARRA DE FILTRO ESTILIZADA --}}
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h3 class="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                        <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        Buscar Vacantes
+                    </h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Encuentra un equipo que necesite tu perfil técnico.</p>
+                </div>
+                
+                <form method="GET" action="{{ route('participante.equipos.join') }}" class="w-full md:w-auto">
+                    <div class="relative">
+                        <select name="evento_id" onchange="this.form.submit()"
+                            class="w-full md:w-64 pl-4 pr-10 py-2.5 bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-700 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow cursor-pointer appearance-none">
+                            <option value="">Todos los eventos activos</option>
+                            @foreach ($eventos as $evento)
+                                <option value="{{ $evento->id }}" {{ request('evento_id') == $evento->id ? 'selected' : '' }}>
+                                    {{ $evento->nombre }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </div>
                 </form>
             </div>
 
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
+            {{-- MENSAJES DE ERROR --}}
+            @if (session('error'))
+                <div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-xl dark:bg-red-900/50 dark:text-red-300 border border-red-200 dark:border-red-800 flex items-center gap-2" role="alert">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    {{ session('error') }}
+                </div>
+            @endif
 
-                    @if (session('error'))
-                        <div class="mb-4 p-4 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-red-200 dark:text-red-800"
-                            role="alert">
-                            {{ session('error') }}
-                        </div>
-                    @endif
+            {{-- 2. GRID DE TARJETAS MODERNAS --}}
+            @if ($equiposDisponibles->count() > 0)
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    @foreach ($equiposDisponibles as $equipo)
+                        <div class="group relative bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full overflow-hidden">
+                            
+                            <div class="h-1.5 w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
 
-                    @if ($equiposDisponibles->count() > 0)
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            @foreach ($equiposDisponibles as $equipo)
-                                <div
-                                    class="border border-gray-200 dark:border-gray-700 rounded-lg p-5 flex flex-col justify-between hover:border-indigo-500 transition duration-150">
-
+                            <div class="p-6 flex-1 flex flex-col">
+                                {{-- Header de la Card --}}
+                                <div class="flex justify-between items-start mb-4">
                                     <div>
-                                        <div class="flex justify-between items-start mb-2">
-                                            <h4 class="font-bold text-lg truncate w-2/3" title="{{ $equipo->nombre }}">
-                                                {{ $equipo->nombre }}
-                                            </h4>
-                                            <span
-                                                class="bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300 whitespace-nowrap">
-                                                {{ $equipo->participantes_count }} / 5
-                                            </span>
-                                        </div>
-
-                                        <div
-                                            class="text-xs text-indigo-600 dark:text-indigo-400 font-bold mb-2 uppercase">
-                                            {{ $equipo->proyecto->evento->nombre ?? 'Evento Desconocido' }}
-                                        </div>
-
-                                        <p class="text-sm text-gray-600 dark:text-gray-400 font-medium">
-                                            Proyecto: <span
-                                                class="italic">{{ $equipo->proyecto->nombre ?? 'Sin definir' }}</span>
-                                        </p>
-                                        <p class="text-xs text-gray-500 dark:text-gray-500 mt-2 line-clamp-2">
-                                            {{ $equipo->proyecto->descripcion ?? 'Sin descripción' }}
-                                        </p>
+                                        <h4 class="font-bold text-lg text-gray-900 dark:text-white leading-tight group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                                            {{ $equipo->nombre }}
+                                        </h4>
+                                        <span class="inline-flex items-center mt-1 px-2 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300 uppercase tracking-wide">
+                                            {{ $equipo->proyecto->evento->nombre ?? 'Evento' }}
+                                        </span>
                                     </div>
-
-                                    <div class="mt-5 pt-4 border-t border-gray-100 dark:border-gray-700">
-                                        <form method="POST" action="{{ route('participante.equipos.join.store') }}">
-                                            @csrf
-                                            <input type="hidden" name="equipo_id" value="{{ $equipo->id }}">
-
-                                            <div class="mb-3">
-                                                <label for="rol_{{ $equipo->id }}"
-                                                    class="text-xs text-gray-500 dark:text-gray-400 block mb-1">
-                                                    Selecciona tu rol:
-                                                </label>
-                                                <select id="rol_{{ $equipo->id }}" name="perfil_id"
-                                                    class="w-full text-xs rounded border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 py-1.5"
-                                                    required>
-                                                    @foreach ($perfiles as $perfil)
-                                                        <option value="{{ $perfil->id }}">{{ $perfil->nombre }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-
-                                            <x-primary-button class="w-full justify-center text-xs">
-                                                {{ __('Unirse al Equipo') }}
-                                            </x-primary-button>
-                                        </form>
+                                    <div class="flex items-center bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded-md border border-blue-100 dark:border-blue-800">
+                                        <svg class="w-3 h-3 text-blue-600 dark:text-blue-400 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                                        <span class="text-xs font-bold text-blue-700 dark:text-blue-300">{{ $equipo->participantes_count }}/5</span>
                                     </div>
                                 </div>
-                            @endforeach
-                        </div>
-                    @else
-                        <div class="text-center py-12">
-                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                            </svg>
-                            <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">No hay equipos
-                                disponibles</h3>
-                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                @if (request('evento_id'))
-                                    No se encontraron equipos en el evento seleccionado.
-                                @else
-                                    No hay equipos buscando integrantes en este momento.
-                                @endif
-                            </p>
-                            <div class="mt-6">
-                                <a href="{{ route('participante.equipos.create') }}"
-                                    class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                    Crear mi propio Equipo
-                                </a>
+
+                                {{-- Cuerpo del Proyecto --}}
+                                <div class="mb-4">
+                                    <p class="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1 flex items-center gap-1">
+                                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                                        {{ $equipo->proyecto->nombre ?? 'Sin Proyecto' }}
+                                    </p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 line-clamp-3 leading-relaxed">
+                                        {{ $equipo->proyecto->descripcion ?? 'El equipo no ha añadido una descripción pública del proyecto.' }}
+                                    </p>
+                                </div>
+                                
+                                {{-- Espaciador para empujar el footer --}}
+                                <div class="mt-auto"></div>
                             </div>
+
+                            {{-- Footer: Formulario de Acción --}}
+                            <div class="bg-gray-50 dark:bg-gray-700/30 px-6 py-4 border-t border-gray-100 dark:border-gray-700">
+                                <form method="POST" action="{{ route('participante.equipos.join.store') }}">
+                                    @csrf
+                                    <input type="hidden" name="equipo_id" value="{{ $equipo->id }}">
+
+                                    <div class="space-y-3">
+                                        <div>
+                                            <label for="rol_{{ $equipo->id }}" class="text-[10px] uppercase font-bold text-gray-400 dark:text-gray-500 tracking-wider mb-1 block">Postularse como:</label>
+                                            <select id="rol_{{ $equipo->id }}" name="perfil_id"
+                                                class="w-full text-xs rounded-lg border-gray-300 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200 focus:border-indigo-500 focus:ring-indigo-500 py-2 shadow-sm"
+                                                required>
+                                                <option value="" disabled selected>Selecciona un rol...</option>
+                                                @foreach ($perfiles as $perfil)
+                                                    <option value="{{ $perfil->id }}">{{ $perfil->nombre }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
+                                        <button type="submit" class="w-full flex justify-center items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest transition ease-in-out duration-150 shadow-md hover:shadow-lg">
+                                            Unirse al Equipo
+                                            <svg class="ml-2 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+
                         </div>
-                    @endif
+                    @endforeach
                 </div>
-            </div>
+            @else
+                {{-- EMPTY STATE --}}
+                <div class="flex flex-col items-center justify-center py-16 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 text-center">
+                    <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-full mb-4">
+                        <svg class="h-10 w-10 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">No hay equipos disponibles</h3>
+                    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400 max-w-sm">
+                        @if (request('evento_id'))
+                            No se encontraron equipos reclutando en el evento seleccionado.
+                        @else
+                            Parece que no hay vacantes en este momento. ¡Sé el primero en liderar!
+                        @endif
+                    </p>
+                    <div class="mt-6">
+                        <a href="{{ route('participante.equipos.create') }}" class="inline-flex items-center px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 border border-transparent rounded-lg font-bold text-xs text-white uppercase tracking-widest shadow-lg transition">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                            Crear mi propio Equipo
+                        </a>
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 </x-app-layout>

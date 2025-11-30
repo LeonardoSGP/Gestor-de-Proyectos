@@ -261,4 +261,42 @@ class EquipoController extends Controller
         $equipo->participantes()->detach($participanteId);
         return back()->with('success', 'Miembro eliminado.');
     }
+/**
+     * Permite al usuario autenticado salir de su equipo actual.
+     */
+    public function leave(Request $request)
+    {
+        $user = Auth::user();
+        $participante = $user->participante;
+
+        // Verificar si tiene equipo
+        if (!$participante->equipos()->exists()) {
+            return back()->with('error', 'No perteneces a ningún equipo.');
+        }
+
+        $equipo = $participante->equipos->first();
+
+        // --- CORRECCIÓN: Búsqueda dinámica del ID de Líder ---
+        // Buscamos el perfil por su nombre exacto en la BD
+        $perfilLider = \App\Models\Perfil::where('nombre', 'Líder de Proyecto')->first();
+        
+        // Fallback de seguridad por si no existe el perfil en BD (evita crash)
+        $idLider = $perfilLider ? $perfilLider->id : null; 
+
+        // Verificamos si el usuario actual tiene ese rol en la tabla pivote
+        $esLider = $equipo->participantes()
+            ->where('participante_id', $participante->id)
+            ->wherePivot('perfil_id', $idLider) 
+            ->exists();
+
+        if ($esLider) {
+            // Regla de Negocio: El líder no puede abandonar, debe ceder el rol o eliminar el equipo.
+            return back()->with('error', 'Como líder, no puedes abandonar el equipo. Debes eliminar el proyecto completo o asignar otro líder antes de salir.');
+        }
+
+        // Desvincular al participante
+        $equipo->participantes()->detach($participante->id);
+
+        return redirect()->route('participante.dashboard')->with('success', 'Has abandonado el equipo correctamente.');
+    }
 }

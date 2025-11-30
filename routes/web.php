@@ -86,6 +86,12 @@ Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->grou
     // Resultados y Constancias
     Route::get('/resultados', [ResultadosController::class, 'index'])->name('resultados.index');
     Route::get('/resultados/constancia/{proyecto}/{posicion}', [ResultadosController::class, 'descargarConstancia'])->name('constancia.descargar');
+
+    // Gestión de Carreras
+    Route::resource('carreras', \App\Http\Controllers\Admin\CarreraController::class);
+
+    // Gestión de Perfiles
+    Route::resource('perfiles', \App\Http\Controllers\Admin\PerfilController::class);
 });
 
 // ==========================================
@@ -133,6 +139,7 @@ Route::middleware(['auth', 'role:Participante'])->prefix('participante')->name('
 
         // Gestión de Equipos (CRUD Básico y Acciones Específicas)
         Route::resource('equipos', ParticipanteEquipoController::class)->only(['create', 'store', 'edit', 'update']);
+        Route::delete('/equipos/salir', [\App\Http\Controllers\Participante\EquipoController::class, 'leave'])->name('equipos.leave');
         
         Route::controller(ParticipanteEquipoController::class)->group(function () {
             // Unirse a equipo existente

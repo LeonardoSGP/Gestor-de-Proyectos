@@ -21,7 +21,7 @@
             @endif
 
             {{-- Contenedor Tabla --}}
-            <div class="rounded-sm border border-gray-200 bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-gray-700 dark:bg-gray-800 sm:px-7.5 xl:pb-1">
+            <div class="rounded-sm border border-gray-200 bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-gray-700 dark:bg-gray-800 sm:px-7.5 xl:pb-1 sm: rounded-3xl">
                 
                 {{-- Filtros --}}
                 <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -93,6 +93,7 @@
                                             </span>
                                         @endforeach
                                     </td>
+                                    
                                     <td class="py-5 px-4">
                                         <p class="text-black dark:text-white">{{ $usuario->created_at->format('d M, Y') }}</p>
                                     </td>
