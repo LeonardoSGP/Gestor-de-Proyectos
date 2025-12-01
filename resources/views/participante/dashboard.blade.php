@@ -498,5 +498,9 @@
         </div>
     </div>
 
-   
+    {{-- SCRIPT GRÁFICO (BARRAS HORIZONTALES) --}}
+    @if ($equipo && $proyecto)
+        {{-- ... (El mismo script de Chart.js que ya tenías) ... --}}
+    
+    @endif
 </x-app-layout>
