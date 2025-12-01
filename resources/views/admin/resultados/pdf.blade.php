@@ -4,16 +4,16 @@
     <meta charset="UTF-8">
     <title>Constancia</title>
     <style>
-        body { font-family: 'Helvetica', sans-serif; text-align: center; padding: 40px; border: 10px double #1a202c; height: 90%; }
-        .header { margin-bottom: 30px; }
+        body { font-family: 'Helvetica', sans-serif; text-align: center; padding: 20px; border: 10px double #1a202c; height: 90%; }
+        .header { margin-bottom: 15px; }
         .logo { font-size: 30px; font-weight: bold; color: #4a5568; text-transform: uppercase; }
-        .title { font-size: 50px; font-weight: bold; color: #2d3748; margin: 20px 0; font-family: 'Georgia', serif; }
-        .subtitle { font-size: 20px; color: #718096; margin-bottom: 40px; }
-        .recipient { font-size: 28px; font-weight: bold; color: #1a202c; margin: 20px 0; border-bottom: 2px solid #cbd5e0; display: inline-block; padding-bottom: 10px; }
+        .title { font-size: 50px; font-weight: bold; color: #2d3748; margin: 10px 0; font-family: 'Georgia', serif; }
+        .subtitle { font-size: 20px; color: #718096; margin-bottom: 20px; }
+        .recipient { font-size: 28px; font-weight: bold; color: #1a202c; margin: 15px 0; border-bottom: 2px solid #cbd5e0; display: inline-block; padding-bottom: 10px; }
         .event { font-size: 24px; font-weight: bold; color: #2b6cb0; margin-top: 10px; }
-        .achievement { font-size: 35px; font-weight: bold; color: #d69e2e; margin: 30px 0; text-transform: uppercase; letter-spacing: 2px; }
-        .date { position: absolute; bottom: 60px; left: 0; right: 0; font-size: 14px; color: #718096; }
-        .signatures { position: absolute; bottom: 80px; width: 100%; display: table; }
+        .achievement { font-size: 35px; font-weight: bold; color: #d69e2e; margin: 20px 0; text-transform: uppercase; letter-spacing: 2px; }
+        .date { position: absolute; bottom: 40px; left: 0; right: 0; font-size: 14px; color: #718096; }
+        .signatures { position: absolute; bottom: 60px; width: 100%; display: table; }
         .sig-block { display: table-cell; width: 50%; vertical-align: bottom; }
         .line { width: 200px; border-top: 1px solid #000; margin: 0 auto 10px auto; }
     </style>
