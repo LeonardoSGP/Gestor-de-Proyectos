@@ -6,7 +6,8 @@
         </h2>
     </x-slot>
 
-    <div class="py-12">
+    {{-- CAMBIO AQUÍ: Se redujo py-12 a py-8 para menos espacio arriba --}}
+    <div class="py-8">
         <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
             {{-- Tarjeta Principal del Formulario --}}
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-2xl border border-gray-100 dark:border-gray-700 transition-all duration-300 hover:shadow-2xl">
@@ -52,25 +53,85 @@
                         </div>
 
                         {{-- Campo: Carrera --}}
-                        <div>
-                            <x-input-label for="carrera_id" :value="__('Carrera')" class="text-base font-medium pl-1" />
+                        {{-- Campo: Carrera (Select Personalizado con Alpine.js y Tailwind) --}}
+                        <div x-data="{
+                                open: false,
+                                selectedId: '{{ old('carrera_id', $perfil->carrera_id ?? '') }}',
+                                selectedName: '',
+                                options: [
+                                    @foreach($carreras as $carrera)
+                                        { id: '{{ $carrera->id }}', name: '{{ addslashes($carrera->nombre) }}' },
+                                    @endforeach
+                                ],
+                                init() {
+                                    if (this.selectedId) {
+                                        const found = this.options.find(o => o.id == this.selectedId);
+                                        if (found) this.selectedName = found.name;
+                                    }
+                                },
+                                selectOption(option) {
+                                    this.selectedId = option.id;
+                                    this.selectedName = option.name;
+                                    this.open = false;
+                                }
+                            }"
+                            class="relative">
+                            
+                            <x-input-label for="carrera_id_trigger" :value="__('Carrera')" class="text-base font-medium pl-1" />
+                            
+                            {{-- Input oculto para enviar el dato en el formulario --}}
+                            <input type="hidden" name="carrera_id" :value="selectedId" required>
+
                             <div class="relative mt-2">
-                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 dark:text-gray-500">
+                                {{-- Icono izquierdo --}}
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 dark:text-gray-500 z-10">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
                                 </div>
-                                <select id="carrera_id" name="carrera_id" 
-                                        class="block w-full pl-12 py-3 text-base bg-gray-50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-700 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:text-white transition-all appearance-none">
-                                    <option value="">Selecciona tu carrera</option>
-                                    @foreach($carreras as $carrera)
-                                        <option value="{{ $carrera->id }}" 
-                                            {{ old('carrera_id', $perfil->carrera_id ?? '') == $carrera->id ? 'selected' : '' }}>
-                                            {{ $carrera->nombre }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                {{-- Flecha personalizada para el select --}}
+
+                                {{-- Trigger (El botón que parece un input) --}}
+                                <button type="button"
+                                        id="carrera_id_trigger"
+                                        @click="open = !open"
+                                        @click.away="open = false"
+                                        class="relative w-full pl-12 pr-10 py-3 text-left text-base bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                                        :class="{'ring-2 ring-indigo-500 border-transparent': open}">
+                                    <span x-text="selectedName ? selectedName : 'Selecciona tu carrera'"
+                                          :class="selectedName ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-500'">
+                                    </span>
+                                </button>
+
+                                {{-- Icono derecho (Flecha animada) --}}
                                 <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-gray-400">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"></path></svg>
+                                    <svg class="w-5 h-5 transition-transform duration-200" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </div>
+
+                                {{-- Menú Desplegable Personalizado --}}
+                                <div x-show="open"
+                                     x-transition:enter="transition ease-out duration-200"
+                                     x-transition:enter-start="opacity-0 translate-y-1"
+                                     x-transition:enter-end="opacity-100 translate-y-0"
+                                     x-transition:leave="transition ease-in duration-150"
+                                     x-transition:leave-start="opacity-100 translate-y-0"
+                                     x-transition:leave-end="opacity-0 translate-y-1"
+                                     class="absolute z-50 mt-2 w-full rounded-xl bg-white dark:bg-[#1a222c] shadow-xl border border-gray-100 dark:border-gray-700 py-2 max-h-60 overflow-auto focus:outline-none scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600"
+                                     style="display: none;">
+                                    
+                                    <template x-for="option in options" :key="option.id">
+                                        <div @click="selectOption(option)"
+                                             class="cursor-pointer select-none relative py-3 pl-4 pr-9 text-gray-900 dark:text-gray-100 hover:bg-indigo-50 dark:hover:bg-indigo-900/50 transition-colors"
+                                             :class="{'bg-indigo-100 dark:bg-indigo-900/80 text-indigo-900 dark:text-white font-medium': selectedId == option.id}">
+                                            <span x-text="option.name" class="block truncate"></span>
+                                            
+                                            {{-- Checkmark icon for selected item --}}
+                                            <span x-show="selectedId == option.id" class="absolute inset-y-0 right-0 flex items-center pr-4 text-indigo-600 dark:text-indigo-400">
+                                                <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                                </svg>
+                                            </span>
+                                        </div>
+                                    </template>
                                 </div>
                             </div>
                             <x-input-error :messages="$errors->get('carrera_id')" class="mt-2 pl-1" />
