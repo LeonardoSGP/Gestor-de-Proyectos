@@ -30,9 +30,15 @@ class ParticipanteController extends Controller
         // Solicitudes pendientes (si es líder)
         $solicitudes_pendientes = [];
         if ($equipo) {
-            $solicitudes_pendientes = $equipo->solicitudesPendientes()
-                ->with(['participante.user', 'participante.carrera'])
-                ->get();
+            // Verificar si es líder
+            $lider = $equipo->getLider();
+            $es_lider = $lider && $lider->id === $participante->id;
+            
+            if ($es_lider) {
+                $solicitudes_pendientes = $equipo->solicitudesPendientes()
+                    ->with(['participante.user', 'participante.carrera'])
+                    ->get();
+            }
         }
 
         // Variables iniciales

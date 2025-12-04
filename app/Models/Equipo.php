@@ -31,7 +31,7 @@ class Equipo extends Model
 
     public function solicitudesPendientes()
     {
-        return $this->hasMany(SolicitudEquipo::class)->where('estado', 'pendiente');
+        return $this->solicitudes()->where('estado', 'pendiente');
     }
 
     public function getLider()
