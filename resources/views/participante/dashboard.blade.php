@@ -155,6 +155,46 @@
                             </div>
                         </div>
 
+                        {{-- WIDGET: SOLICITUDES PENDIENTES (Solo para Líderes) --}}
+                        @php
+                            $es_lider_actual = $equipo && $equipo->getLider() && $equipo->getLider()->id === Auth::user()->participante->id;
+                        @endphp
+
+                        @if ($es_lider_actual && $solicitudes_pendientes->count() > 0)
+                            <div class="bg-white dark:bg-gray-800 rounded-xl border border-yellow-200 dark:border-yellow-900/50 shadow-sm overflow-hidden">
+                                <div class="px-6 py-4 border-b border-yellow-100 dark:border-yellow-900/30 bg-yellow-50 dark:bg-yellow-900/10">
+                                    <h3 class="font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-yellow-500"></span>
+                                        Solicitudes Pendientes
+                                        <span class="ml-auto bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 text-xs font-bold px-2 py-1 rounded-full">
+                                            {{ $solicitudes_pendientes->count() }}
+                                        </span>
+                                    </h3>
+                                </div>
+                                <div class="p-6 space-y-3">
+                                    @foreach ($solicitudes_pendientes as $solicitud)
+                                        <div class="flex items-center justify-between gap-4 p-4 bg-gray-50 dark:bg-gray-700/30 rounded-lg border border-gray-100 dark:border-gray-700">
+                                            <div class="flex items-center gap-3 min-w-0 flex-1">
+                                                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-yellow-200 dark:bg-yellow-900/30 flex items-center justify-center text-yellow-700 dark:text-yellow-400 font-bold">
+                                                    {{ substr($solicitud->participante->user->name, 0, 1) }}
+                                                </div>
+                                                <div class="min-w-0">
+                                                    <p class="text-sm font-semibold text-gray-900 dark:text-white truncate">{{ $solicitud->participante->user->name }}</p>
+                                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ $solicitud->participante->no_control ?? 'N/A' }}</p>
+                                                </div>
+                                            </div>
+                                            <a href="{{ route('participante.solicitudes.equipo', $equipo) }}" class="flex-shrink-0 px-3 py-1.5 rounded-lg bg-yellow-600 hover:bg-yellow-700 text-white text-xs font-bold transition">
+                                                Revisar
+                                            </a>
+                                        </div>
+                                    @endforeach
+                                    <a href="{{ route('participante.solicitudes.equipo', $equipo) }}" class="block w-full text-center mt-4 py-2 text-indigo-600 dark:text-indigo-400 hover:underline text-sm font-semibold">
+                                        Ver todas las solicitudes →
+                                    </a>
+                                </div>
+                            </div>
+                        @endif
+
                         {{-- 3. RETROALIMENTACIÓN --}}
                         <div
                             class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-6">

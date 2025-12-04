@@ -27,6 +27,14 @@ class ParticipanteController extends Controller
         $equipo = $participante ? $participante->equipos->first() : null;
         $proyecto = $equipo ? $equipo->proyecto : null;
 
+        // Solicitudes pendientes (si es líder)
+        $solicitudes_pendientes = [];
+        if ($equipo) {
+            $solicitudes_pendientes = $equipo->solicitudesPendientes()
+                ->with(['participante.user', 'participante.carrera'])
+                ->get();
+        }
+
         // Variables iniciales
         $chartLabels = [];
         $chartData = []; // Datos crudos (0-10) para el gráfico visual
@@ -92,7 +100,8 @@ class ParticipanteController extends Controller
             'chartLabels',
             'chartData',
             'puntajeTotal', // Este ahora es el cálculo exacto ponderado
-            'eventos_proximos'
+            'eventos_proximos',
+            'solicitudes_pendientes'
         ));
     }
 
